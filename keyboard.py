@@ -27,6 +27,7 @@ def main():
         # captures the 'KEYDOWN' and 'KEYUP' events
         if event.type in (pygame.KEYDOWN, pygame.KEYUP):
             # gets the key name
+            key_code = event.key
             key_name = pygame.key.name(event.key)
 
             # converts to uppercase the key name
@@ -36,11 +37,8 @@ def main():
             if event.type == pygame.KEYDOWN:
                 # prints on the console the key pressed
                 print(u'"{}" key pressed'.format(key_name))
+                print(u'key code:"{}"'.format(key_code))
 
-            # if any key is released
-            elif event.type == pygame.KEYUP:
-                # prints on the console the released key
-                print(u'"{}" key released'.format(key_name))
 
     # finalizes Pygame
     pygame.quit()
