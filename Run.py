@@ -240,5 +240,5 @@ while Running==True:
     FrameRateText.Draw(0,0)
 
     #UpdatesDisplay
-    Clock.tick()
+    Clock.tick(60)
     pygame.display.flip()
