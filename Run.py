@@ -10,8 +10,10 @@ Font=pygame.font.Font(None,32)
 
 Clock=pygame.time.Clock()
 
-def LoadImage(FileLocation,Res):
+def LoadImage(FileLocation,Res,Trans=False):
     NormalImage=pygame.image.load(FileLocation)
+    if Trans==False:
+        NormalImage=pygame.image.load(FileLocation).convert()
     ScaleImage=pygame.transform.scale(NormalImage,Res)
     return ScaleImage
 
@@ -30,6 +32,7 @@ class Cell:
         self.SizeX=50
         self.SizeY=50
         self.Name=Name
+        self.Generate()
         self.Load()
     def Generate(self):
         self.TileMap=[]
@@ -37,16 +40,16 @@ class Cell:
             self.TileMap.append([])
             for y in range(0,self.SizeY):
                 if x==1 or x==self.SizeX-2 or y==1 or y==self.SizeY-2:
-                    self.TileMap[x].append(0)
+                    self.TileMap[x].append([0,0])
                 else:
-                    self.TileMap[x].append(random.randint(0,2))
+                    self.TileMap[x].append([random.randint(0,2),random.randint(0,1)])
         self.Save()
     def Save(self):
         with open("Offices/"+str(self.Name)+".Map","w") as w:
             for x in self.TileMap:
                 LineToWrite=""
                 for y in x:
-                    LineToWrite=LineToWrite+str(y)+","
+                    LineToWrite=LineToWrite+str(y[0])+"."+str(y[1])+","
                 LineToWrite=LineToWrite+"\n"
                 w.writelines(LineToWrite)
     def Load(self):
@@ -57,7 +60,8 @@ class Cell:
                 self.TileMap.append([])
                 Data=Line.split(",")
                 for Tile in Data[0:-2]:
-                    self.TileMap[x].append(int(Tile.strip("\n")))
+                    Tile=Tile.split(".")
+                    self.TileMap[x].append([int(Tile[0]),int(Tile[1].strip("\n"))])
                 x+=1
                 
 class Camera:
@@ -81,39 +85,43 @@ class Camera:
         self.Collision()
         pass
 
-Sky=LoadImage("Sky.png",[1280,720])
 CPUSide=LoadImage("Assets/CPU/WallSide.png",[128,128])
 CPUBack=LoadImage("Assets/CPU/WallBack.png",[128,128])
-CPUWindow=LoadImage("Assets/CPU/WallBackWindow.png",[128,128])
+CPUWindow=LoadImage("Assets/CPU/WallBackWindow.png",[128,128],Trans=True)
 
 GPUSide=LoadImage("Assets/GPU/WallSide.png",[128,128])
 GPUBack=LoadImage("Assets/GPU/WallBack.png",[128,128])
-GPUWindow=LoadImage("Assets/GPU/WallBackWindow.png",[128,128])
+GPUWindow=LoadImage("Assets/GPU/WallBackWindow.png",[128,128],Trans=True)
 
 RAMSide=LoadImage("Assets/RAM/WallSide.png",[128,128])
 RAMBack=LoadImage("Assets/RAM/WallBack.png",[128,128])
-RAMWindow=LoadImage("Assets/RAM/WallBackWindow.png",[128,128])
+RAMWindow=LoadImage("Assets/RAM/WallBackWindow.png",[128,128],Trans=True)
 
 HDDSide=LoadImage("Assets/HDD/WallSide.png",[128,128])
 HDDBack=LoadImage("Assets/HDD/WallBack.png",[128,128])
-HDDWindow=LoadImage("Assets/HDD/WallBackWindow.png",[128,128])
+HDDWindow=LoadImage("Assets/HDD/WallBackWindow.png",[128,128],Trans=True)
 
 PSUSide=LoadImage("Assets/PSU/WallSide.png",[128,128])
 PSUBack=LoadImage("Assets/PSU/WallBack.png",[128,128])
-PSUWindow=LoadImage("Assets/PSU/WallBackWindow.png",[128,128])
+PSUWindow=LoadImage("Assets/PSU/WallBackWindow.png",[128,128],Trans=True)
 
 CCUSide=LoadImage("Assets/CCU/WallSide.png",[128,128])
 CCUBack=LoadImage("Assets/CCU/WallBack.png",[128,128])
-CCUWindow=LoadImage("Assets/CCU/WallBackWindow.png",[128,128])
+CCUWindow=LoadImage("Assets/CCU/WallBackWindow.png",[128,128],Trans=True)
+
+Desk=LoadImage("Assets/CPU/Desk.png",[128,128],Trans=True)
 
 PlayerOne=Camera()
 FrameRateText=Text("Frames: ")
 
 Tiles=[CPUSide,CPUBack,CPUWindow]
+Entity=[None,Desk]
+Selected=LoadImage("Assets/Selected.png",[128,128],Trans=True)
 
 CurrentCell=Cell()
 #CurrentCell.Generate()
 Running=True
+Editor=True
 
 OfficeSelect=LoadImage("OfficeSelect.png",[1280,720])
 
@@ -140,7 +148,10 @@ def InCell():
     OffY=((math.floor(PlayerOne.Y)-PlayerOne.Y)*128)
     for x in range(math.floor(PlayerOne.X),math.ceil(PlayerOne.X+PlayerOne.ZoomX)):
         for y in range(math.floor(PlayerOne.Y),math.ceil(PlayerOne.Y+PlayerOne.ZoomY)):
-            Display.blit(Tiles[CurrentOffice.TileMap[x][y]],[DrawX+OffX,DrawY+OffY])
+            if CurrentOffice.SizeY-1>y:
+                Display.blit(Tiles[CurrentOffice.TileMap[x][y][0]],[DrawX+OffX,DrawY+OffY])
+                if CurrentOffice.TileMap[x][y][1]!=0:
+                    Display.blit(Entity[CurrentOffice.TileMap[x][y][1]],[DrawX+OffX,DrawY+OffY])
             DrawY+=128
         DrawX+=128
         DrawY=-128
@@ -164,6 +175,12 @@ def InCell():
 
     if Keys[pygame.K_ESCAPE]:
         DisplayState="CellSelect"
+
+    #Mouse
+    MousePos=pygame.mouse.get_pos()
+    MouseClick=pygame.mouse.get_pressed()
+    Display.blit(Selected,[((MousePos[0]//128)*128)+OffX,((MousePos[1]//128)*128)+OffY])
+    SelectedCoords=[PlayerOne.X+PlayerOne.ZoomX,PlayerOne.Y]
 
     #PlayerUpdate
     PlayerOne.Update()
