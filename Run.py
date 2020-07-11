@@ -1,6 +1,8 @@
-import pygame
-import random
-import math
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame, sys, random, math
+    from pygame.locals import *
+
 
 Display=pygame.display.set_mode([1280,720])
 
@@ -242,6 +244,7 @@ while Running==True:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             pygame.quit()
+            sys.exit()
     #ScreenFill
     Display.fill((155,155,155))
 
