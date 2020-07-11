@@ -89,29 +89,29 @@ class Camera:
 
 CPUSide=LoadImage("Assets/CPU/WallSide.png",[128,128])
 CPUBack=LoadImage("Assets/CPU/WallBack.png",[128,128])
-CPUWindow=LoadImage("Assets/CPU/WallBackWindow.png",[128,128],Trans=True)
+CPUWindow=LoadImage("Assets/CPU/WallBackWindow.png",[128,128],True)
 
 GPUSide=LoadImage("Assets/GPU/WallSide.png",[128,128])
 GPUBack=LoadImage("Assets/GPU/WallBack.png",[128,128])
-GPUWindow=LoadImage("Assets/GPU/WallBackWindow.png",[128,128],Trans=True)
+GPUWindow=LoadImage("Assets/GPU/WallBackWindow.png",[128,128],True)
 
 RAMSide=LoadImage("Assets/RAM/WallSide.png",[128,128])
 RAMBack=LoadImage("Assets/RAM/WallBack.png",[128,128])
-RAMWindow=LoadImage("Assets/RAM/WallBackWindow.png",[128,128],Trans=True)
+RAMWindow=LoadImage("Assets/RAM/WallBackWindow.png",[128,128],True)
 
 HDDSide=LoadImage("Assets/HDD/WallSide.png",[128,128])
 HDDBack=LoadImage("Assets/HDD/WallBack.png",[128,128])
-HDDWindow=LoadImage("Assets/HDD/WallBackWindow.png",[128,128],Trans=True)
+HDDWindow=LoadImage("Assets/HDD/WallBackWindow.png",[128,128],True)
 
 PSUSide=LoadImage("Assets/PSU/WallSide.png",[128,128])
 PSUBack=LoadImage("Assets/PSU/WallBack.png",[128,128])
-PSUWindow=LoadImage("Assets/PSU/WallBackWindow.png",[128,128],Trans=True)
+PSUWindow=LoadImage("Assets/PSU/WallBackWindow.png",[128,128],True)
 
 CCUSide=LoadImage("Assets/CCU/WallSide.png",[128,128])
 CCUBack=LoadImage("Assets/CCU/WallBack.png",[128,128])
-CCUWindow=LoadImage("Assets/CCU/WallBackWindow.png",[128,128],Trans=True)
+CCUWindow=LoadImage("Assets/CCU/WallBackWindow.png",[128,128],True)
 
-Desk=LoadImage("Assets/CPU/Desk.png",[128,128],Trans=True)
+Desk=LoadImage("Assets/CPU/Desk.png",[128,128],True)
 
 PlayerOne=Camera()
 FrameRateText=Text("Frames: ")
