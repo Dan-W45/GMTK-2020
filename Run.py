@@ -1,10 +1,11 @@
 import contextlib
 with contextlib.redirect_stdout(None):
-    import pygame, sys, random, math
+    import pygame, sys, random, math,os
     from pygame.locals import *
 
 
 Display=pygame.display.set_mode([1280,720])
+os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
 
 pygame.font.init()
 
@@ -48,7 +49,7 @@ class Person:
         self.PrevTask="WorkAtDesk"
         self.Image=LoadImage("Player.png",[TileScale,TileScale],Trans=True)
     def Move(self):
-        if random.randint(0,10)==0:
+        if random.randint(0,7)==0:
             self.Happy-=(self.CurrentOffice.Production/self.CurrentOffice.NumOfDesks)
         '''
         if self.Happy<25:
@@ -59,7 +60,6 @@ class Person:
             print(self.Name,"Mood")'''
         if self.Happy>100:
             self.Happy=100
-            print(self.Name,"Is extra productive")
         if self.Task=="Wonder":
             DeltaMove=0
             if random.randint(0,20)==0:
@@ -73,7 +73,7 @@ class Person:
                     elif Elv[1]==[self.X+1,self.Y+1]:
                         self.Y=Elv[0][1]-1
             if random.randint(0,60)==0:#Done Wondering
-                self.Happy+=25
+                self.Happy+=15
                 self.Task="WorkAtDesk"
                 self.PrevTask="Wonder"
         elif self.Task=="WorkAtDesk":
@@ -200,13 +200,15 @@ class Cell:
         self.TileMap=[]
         self.SizeX=50
         self.SizeY=50
+        self.Level=1
         self.Name=Name
         self.People=[]
         self.NumOfDesks=0
         self.AverageHappy=100
         self.Power=100
+        self.PowerReq=100
         self.Production=1
-        self.Load()
+        self.Load("Offices/Tier"+str(self.Level)+"Office.Map")
     def Save(self):
         with open("Offices/"+str(self.Name)+".Map","w") as w:
             for x in self.TileMap:
@@ -215,10 +217,14 @@ class Cell:
                     LineToWrite=LineToWrite+str(y[0])+"."+str(y[1])+","
                 LineToWrite=LineToWrite+"\n"
                 w.writelines(LineToWrite)
-    def Load(self):
+    def Load(self,Location=None):
+        self.People=[]
+        self.NumOfDesks=0
+        if Location==None:
+            Location="Offices/Tier"+str(self.Level)+"Office.Map"
         self.TileMap=[]
         x=0
-        with open("Offices/"+str(self.Name)+".Map","r") as r:
+        with open(Location,"r") as r:
             for Line in r.readlines():
                 self.TileMap.append([])
                 Data=Line.split(",")
@@ -231,8 +237,8 @@ class Cell:
                 x+=1
         for I in range(0,self.NumOfDesks):
             self.People.append(Person(Name=Names[random.randint(0,len(Names)-1)]+"|"+str(self.Name),Office=self))
-        self.Elevators()
-    def Elevators(self):
+        self.FindElevators()
+    def FindElevators(self):
         self.Elevators=[]
         IndexX=0
         IndexY=0
@@ -253,9 +259,10 @@ class Cell:
         for Person in self.People:
             Person.Move()
             AvgHappy+=Person.Happy
+        self.PowerReq=self.NumOfDesks*100
         self.AverageHappy=AvgHappy/len(self.People)
         #print(self.Name, self.AverageHappy)
-        self.Production=((self.Power/self.AverageHappy))*self.NumOfDesks
+        self.Production=(((self.Power/self.PowerReq)*100)/(self.AverageHappy*10))
             
 class Camera:
     def __init__(self):
@@ -328,7 +335,7 @@ Entitys=[None,Desk,WaterCooler,Plant,Desk]
 CurrentCell=Cell()
 #CurrentCell.Generate()
 Running=True
-Editor=True
+Editor=False
 Debug=False
 
 if Debug==True:
@@ -408,11 +415,9 @@ def InCell():
 
     if Keys[pygame.K_F1]:
         print("Saving")
-        CurrentOffice.Save()
     if Keys[pygame.K_F2]:
         print("Loading")
-        CurrentOffice.Load()
-
+        
     if KeyDelay<=0:
         if Keys[pygame.K_q]:
             KeyDelay=10
@@ -428,6 +433,12 @@ def InCell():
                 TileScale=32
             LoadImages()
             KeyDelay=10
+        if Keys[pygame.K_u]:
+            CurrentOffice.Level+=1
+            if CurrentOffice.Level>=7:
+                CurrentOffice.Level=6
+            CurrentOffice.Load()
+            KeyDelay=20
     else:
         KeyDelay-=1
         
@@ -549,6 +560,8 @@ while Running==True:
     #ScreenFill
     Display.fill((155,155,155))
 
+    PowerOutput=PSUOffice.NumOfDesks*400
+
     CPUOffice.Update()
     GPUOffice.Update()
     RAMOffice.Update()
@@ -556,13 +569,15 @@ while Running==True:
     PSUOffice.Update()
     CCUOffice.Update()
 
-    Money+=((CPUOffice.Production+GPUOffice.Production)*(-RAMOffice.Production-HDDOffice.Production))
-    print(Money)
-
     if DisplayState=="CellOffice":
         InCell()
     elif DisplayState=="CellSelect":
         InSelect()
+
+    Money+=(CPUOffice.Production+GPUOffice.Production+RAMOffice.Production+HDDOffice.Production)/4/10
+    MoneyText.TextStr="Money's: "+str(round(Money))
+    MoneyText.Generate()
+    MoneyText.Draw(0,32)
 
     #DrawText
     if str(round(Clock.get_fps()))!=FrameRateText.TextStr:
