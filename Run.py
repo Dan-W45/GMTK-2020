@@ -287,35 +287,41 @@ class Camera:
         pass
 
 def LoadImages():
-    global CPUSide,CPUBack,CPUWindow,GPUSide,GPUBack,GPUWindow
-    global RAMSide,RAMBack,RAMWindow,HDDSide,HDDBack,HDDWindow
-    global PSUSide,PSUBack,PSUWindow,CCUSide,CCUBack,CCUWindow
+    global CPUSide,CPUSideBlank,CPUBack,CPUWindow,GPUSide,GPUSideBlank,GPUBack,GPUWindow
+    global RAMSide,RAMSideBlank,RAMBack,RAMWindow,HDDSide,HDDSideBlank,HDDBack,HDDWindow
+    global PSUSide,PSUSideBlank,PSUBack,PSUWindow,CCUSide,CCUSideBlank,CCUBack,CCUWindow
     global Desk,Selected,ElevatorEnter,ElevatorShaft,WaterCooler,Plant
     CPUSide=LoadImage("Assets/CPU/WallSide.png",[TileScale,TileScale])
+    CPUSideBlank=LoadImage("Assets/CPU/WallSideBlank.png",[TileScale,TileScale])
     CPUBack=LoadImage("Assets/CPU/WallBack.png",[TileScale,TileScale])
     CPUWindow=LoadImage("Assets/CPU/WallBackWindow.png",[TileScale,TileScale],True)
 
     GPUSide=LoadImage("Assets/GPU/WallSide.png",[TileScale,TileScale])
+    GPUSideBlank=LoadImage("Assets/GPU/WallSideBlank.png",[TileScale,TileScale])
     GPUBack=LoadImage("Assets/GPU/WallBack.png",[TileScale,TileScale])
     GPUWindow=LoadImage("Assets/GPU/WallBackWindow.png",[TileScale,TileScale],True)
 
     RAMSide=LoadImage("Assets/RAM/WallSide.png",[TileScale,TileScale])
+    RAMSideBlank=LoadImage("Assets/RAM/WallSideBlank.png",[TileScale,TileScale])
     RAMBack=LoadImage("Assets/RAM/WallBack.png",[TileScale,TileScale])
     RAMWindow=LoadImage("Assets/RAM/WallBackWindow.png",[TileScale,TileScale],True)
 
     HDDSide=LoadImage("Assets/HDD/WallSide.png",[TileScale,TileScale])
+    HDDSideBlank=LoadImage("Assets/HDD/WallSideBlank.png",[TileScale,TileScale])
     HDDBack=LoadImage("Assets/HDD/WallBack.png",[TileScale,TileScale])
     HDDWindow=LoadImage("Assets/HDD/WallBackWindow.png",[TileScale,TileScale],True)
 
     PSUSide=LoadImage("Assets/PSU/WallSide.png",[TileScale,TileScale])
+    PSUSideBlank=LoadImage("Assets/PSU/WallSideBlank.png",[TileScale,TileScale])
     PSUBack=LoadImage("Assets/PSU/WallBack.png",[TileScale,TileScale])
     PSUWindow=LoadImage("Assets/PSU/WallBackWindow.png",[TileScale,TileScale],True)
 
     CCUSide=LoadImage("Assets/CCU/WallSide.png",[TileScale,TileScale])
+    CCUSideBlank=LoadImage("Assets/CCU/WallSideBlank.png",[TileScale,TileScale])
     CCUBack=LoadImage("Assets/CCU/WallBack.png",[TileScale,TileScale])
     CCUWindow=LoadImage("Assets/CCU/WallBackWindow.png",[TileScale,TileScale],True)
 
-    Desk=LoadImage("Assets/CPU/Desk.png",[TileScale,TileScale],True)
+    Desk=LoadImage("Assets/Desk.png",[TileScale,TileScale],True)
     WaterCooler=LoadImage("Assets/WaterCooler.png",[TileScale,TileScale],True)
     Plant=LoadImage("Assets/Plant.png",[TileScale,TileScale],True)
 
@@ -389,7 +395,10 @@ def InCell():
     for x in range(math.floor(MainCamera.X),math.ceil(MainCamera.X+MainCamera.ZoomX)+1):
         for y in range(math.floor(MainCamera.Y),math.ceil(MainCamera.Y+MainCamera.ZoomY)+1):
             if CurrentOffice.SizeY-1>y:
-                Display.blit(Tiles[CurrentOffice.TileMap[x][y][0]],[DrawX+OffX,DrawY+OffY])
+                if CurrentOffice.TileMap[x][y][0] == 0:
+                    Display.blit(Tiles[random.choice([0,5,5,5,5,5,5,5])],[DrawX+OffX,DrawY+OffY])   ##Ooh funsies
+                else:
+                    Display.blit(Tiles[CurrentOffice.TileMap[x][y][0]],[DrawX+OffX,DrawY+OffY])
                 if CurrentOffice.TileMap[x][y][1]!=0:
                     Display.blit(Entitys[CurrentOffice.TileMap[x][y][1]],[DrawX+OffX,DrawY+OffY])
             DrawY+=TileScale
@@ -513,37 +522,37 @@ def InSelect():
         if 50<MousePos[0]<350:
             if 50<MousePos[1]<400:
                 CurrentOffice=CPUOffice
-                Tiles=[CPUSide,CPUBack,CPUWindow,ElevatorEnter,ElevatorShaft]
+                Tiles=[CPUSide,CPUBack,CPUWindow,ElevatorEnter,ElevatorShaft,CPUSideBlank]
                 DisplayState="CellOffice"
                 
         if 350<MousePos[0]<650:
             if 50<MousePos[1]<400:
                 CurrentOffice=GPUOffice
-                Tiles=[GPUSide,GPUBack,GPUWindow,ElevatorEnter,ElevatorShaft]
+                Tiles=[GPUSide,GPUBack,GPUWindow,ElevatorEnter,ElevatorShaft,GPUSideBlank]
                 DisplayState="CellOffice"
                 
         if 650<MousePos[0]<950:
             if 50<MousePos[1]<400:
                 CurrentOffice=RAMOffice
-                Tiles=[RAMSide,RAMBack,RAMWindow,ElevatorEnter,ElevatorShaft]
+                Tiles=[RAMSide,RAMBack,RAMWindow,ElevatorEnter,ElevatorShaft,RAMSideBlank]
                 DisplayState="CellOffice"
                 
         if 200<MousePos[0]<500:
             if 400<MousePos[1]<750:
                 CurrentOffice=HDDOffice
-                Tiles=[HDDSide,HDDBack,HDDWindow,ElevatorEnter,ElevatorShaft]
+                Tiles=[HDDSide,HDDBack,HDDWindow,ElevatorEnter,ElevatorShaft,HDDSideBlank]
                 DisplayState="CellOffice"
                 
         if 500<MousePos[0]<800:
             if 400<MousePos[1]<750:
                 CurrentOffice=PSUOffice
-                Tiles=[PSUSide,PSUBack,PSUWindow,ElevatorEnter,ElevatorShaft]
+                Tiles=[PSUSide,PSUBack,PSUWindow,ElevatorEnter,ElevatorShaft,PSUSideBlank]
                 DisplayState="CellOffice"
                 
         if 800<MousePos[0]<1100:
             if 400<MousePos[1]<750:
                 CurrentOffice=CCUOffice
-                Tiles=[CCUSide,CCUBack,CCUWindow,ElevatorEnter,ElevatorShaft]
+                Tiles=[CCUSide,CCUBack,CCUWindow,ElevatorEnter,ElevatorShaft,CCUSideBlank]
                 DisplayState="CellOffice"
 
 def InMenu():
@@ -577,7 +586,7 @@ while Running==True:
     Money+=(CPUOffice.Production+GPUOffice.Production+RAMOffice.Production+HDDOffice.Production)/4/10
     MoneyText.TextStr="Money's: "+str(round(Money))
     MoneyText.Generate()
-    MoneyText.Draw(0,32)
+    MoneyText.Draw(0,20)
 
     #DrawText
     if str(round(Clock.get_fps()))!=FrameRateText.TextStr:
