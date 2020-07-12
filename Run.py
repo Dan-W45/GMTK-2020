@@ -9,7 +9,7 @@ os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
 
 pygame.font.init()
 
-Font=pygame.font.Font(None,32)
+Font=pygame.font.Font("Coder's Crux.ttf",32)
 
 Clock=pygame.time.Clock()
 
@@ -362,6 +362,7 @@ if Debug==True:
     MadLad.Y=2
 
 OfficeSelect=LoadImage("OfficeSelect.png",[1280,720])
+CPUFan=LoadImage("Fan.png",[135,135],True)
 
 CPUOffice=Cell(Name="CPUOffice")
 GPUOffice=Cell(Name="GPUOffice")
@@ -395,10 +396,10 @@ def InCell():
     for x in range(math.floor(MainCamera.X),math.ceil(MainCamera.X+MainCamera.ZoomX)+1):
         for y in range(math.floor(MainCamera.Y),math.ceil(MainCamera.Y+MainCamera.ZoomY)+1):
             if CurrentOffice.SizeY-1>y:
-                if CurrentOffice.TileMap[x][y][0] == 0:
-                    Display.blit(Tiles[random.choice([0,5,5,5,5,5,5,5])],[DrawX+OffX,DrawY+OffY])   ##Ooh funsies
-                else:
-                    Display.blit(Tiles[CurrentOffice.TileMap[x][y][0]],[DrawX+OffX,DrawY+OffY])
+##                if CurrentOffice.TileMap[x][y][0] == 0:
+##                    Display.blit(Tiles[random.choice([0,5,5,5,5,5,5,5])],[DrawX+OffX,DrawY+OffY])   ##Ooh funsies
+##                else:
+                Display.blit(Tiles[CurrentOffice.TileMap[x][y][0]],[DrawX+OffX,DrawY+OffY])
                 if CurrentOffice.TileMap[x][y][1]!=0:
                     Display.blit(Entitys[CurrentOffice.TileMap[x][y][1]],[DrawX+OffX,DrawY+OffY])
             DrawY+=TileScale
@@ -504,56 +505,95 @@ def InCell():
     #PlayerUpdate
     MainCamera.Update()
 
+def blitRotate(surf, image, pos, originPos, angle):
+
+    # calcaulate the axis aligned bounding box of the rotated image
+    w, h       = image.get_size()
+    box        = [pygame.math.Vector2(p) for p in [(0, 0), (w, 0), (w, -h), (0, -h)]]
+    box_rotate = [p.rotate(angle) for p in box]
+    min_box    = (min(box_rotate, key=lambda p: p[0])[0], min(box_rotate, key=lambda p: p[1])[1])
+    max_box    = (max(box_rotate, key=lambda p: p[0])[0], max(box_rotate, key=lambda p: p[1])[1])
+
+    # calculate the translation of the pivot 
+    pivot        = pygame.math.Vector2(originPos[0], -originPos[1])
+    pivot_rotate = pivot.rotate(angle)
+    pivot_move   = pivot_rotate - pivot
+
+    # calculate the upper left origin of the rotated image
+    origin = (pos[0] - originPos[0] + min_box[0] - pivot_move[0], pos[1] - originPos[1] - max_box[1] + pivot_move[1])
+
+    # get a rotated image
+    rotated_image = pygame.transform.rotate(image, angle)
+
+    # rotate and blit the image
+    surf.blit(rotated_image, origin)
+
+    # draw rectangle around the image
+##    pygame.draw.rect (surf, (255, 0, 0), (*origin, *rotated_image.get_size()),2)
+
+
+angle=0
 def InSelect():
-    global DisplayState,CurrentOffice,Tiles
+    global DisplayState,CurrentOffice,Tiles, angle
     Display.blit(OfficeSelect,[0,0])
+
+
+    angle+=21
+    blitRotate(Display, CPUFan, [456,119], (67,67), angle)
+    if angle >= 360:
+        angle = 0
+
+    
         
-    CPUSelectText.Draw(50,50)
-    GPUSelectText.Draw(350,50)
-    RAMSelectText.Draw(650,50)
-    HDDSelectText.Draw(200,400)
-    PSUSelectText.Draw(500,400)
-    CCUSelectText.Draw(800,400)
+##    CPUSelectText.Draw(50,50)
+##    GPUSelectText.Draw(350,50)
+##    RAMSelectText.Draw(650,50)
+##    HDDSelectText.Draw(200,400)
+##    PSUSelectText.Draw(500,400)
+##    CCUSelectText.Draw(800,400)
 
     MousePos=pygame.mouse.get_pos()
     MouseClick=pygame.mouse.get_pressed()
 
     if MouseClick[0]==True:
-        if 50<MousePos[0]<350:
-            if 50<MousePos[1]<400:
+        if 435<MousePos[0]<474:#145,33,13,13
+            if 99<MousePos[1]<138:
                 CurrentOffice=CPUOffice
                 Tiles=[CPUSide,CPUBack,CPUWindow,ElevatorEnter,ElevatorShaft,CPUSideBlank]
                 DisplayState="CellOffice"
-                
-        if 350<MousePos[0]<650:
-            if 50<MousePos[1]<400:
+
+        elif 387<MousePos[0]<522:#129,17,45,45
+            if 51<MousePos[1]<186:
+                CurrentOffice=CCUOffice
+                Tiles=[CCUSide,CCUBack,CCUWindow,ElevatorEnter,ElevatorShaft,CCUSideBlank]
+                DisplayState="CellOffice"
+
+        if 303<MousePos[0]<670:#101,111,125,18
+            if 333<MousePos[1]<387:
                 CurrentOffice=GPUOffice
                 Tiles=[GPUSide,GPUBack,GPUWindow,ElevatorEnter,ElevatorShaft,GPUSideBlank]
                 DisplayState="CellOffice"
+
                 
-        if 650<MousePos[0]<950:
-            if 50<MousePos[1]<400:
+        if 576<MousePos[0]<621:#192,7,15,66
+            if 21<MousePos[1]<219:
                 CurrentOffice=RAMOffice
                 Tiles=[RAMSide,RAMBack,RAMWindow,ElevatorEnter,ElevatorShaft,RAMSideBlank]
                 DisplayState="CellOffice"
                 
-        if 200<MousePos[0]<500:
-            if 400<MousePos[1]<750:
+        if 759<MousePos[0]<888:#253,162,43,58
+            if 486<MousePos[1]<660:
                 CurrentOffice=HDDOffice
                 Tiles=[HDDSide,HDDBack,HDDWindow,ElevatorEnter,ElevatorShaft,HDDSideBlank]
                 DisplayState="CellOffice"
                 
-        if 500<MousePos[0]<800:
-            if 400<MousePos[1]<750:
+        if 303<MousePos[0]<573:#101,180,90,60
+            if 540<MousePos[1]<720:
                 CurrentOffice=PSUOffice
                 Tiles=[PSUSide,PSUBack,PSUWindow,ElevatorEnter,ElevatorShaft,PSUSideBlank]
                 DisplayState="CellOffice"
                 
-        if 800<MousePos[0]<1100:
-            if 400<MousePos[1]<750:
-                CurrentOffice=CCUOffice
-                Tiles=[CCUSide,CCUBack,CCUWindow,ElevatorEnter,ElevatorShaft,CCUSideBlank]
-                DisplayState="CellOffice"
+
 
 def InMenu():
     pass
@@ -586,13 +626,13 @@ while Running==True:
     Money+=(CPUOffice.Production+GPUOffice.Production+RAMOffice.Production+HDDOffice.Production)/4/10
     MoneyText.TextStr="Money's: "+str(round(Money))
     MoneyText.Generate()
-    MoneyText.Draw(0,20)
+    MoneyText.Draw(2,20)
 
     #DrawText
     if str(round(Clock.get_fps()))!=FrameRateText.TextStr:
-        FrameRateText.TextStr=str(round(Clock.get_fps()))
+        FrameRateText.TextStr="FPS: "+str(round(Clock.get_fps()))
         FrameRateText.Generate()
-    FrameRateText.Draw(0,0)
+    FrameRateText.Draw(2,2)
 
     #UpdatesDisplay
     Clock.tick(60)
