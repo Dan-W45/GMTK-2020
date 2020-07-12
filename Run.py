@@ -13,7 +13,7 @@ Font=pygame.font.Font(None,32)
 Clock=pygame.time.Clock()
 
 TileScales=[32,64,128,256,512]
-TileScale=TileScales[1]
+TileScale=TileScales[2]
 
 def LoadImage(FileLocation,Res,Trans=False):
     NormalImage=pygame.image.load(FileLocation)
@@ -31,6 +31,162 @@ class Text:
     def Draw(self,X,Y):
         Display.blit(self.TextImage,[X,Y])
 
+class Person:
+    def __init__(self,Name="Dave"):
+        self.X=1
+        self.Y=1
+        self.Name=Name
+        self.Task="Wonder"
+        self.PrevTask="Wonder"
+        self.Image=LoadImage("Player.png",[TileScale,TileScale],Trans=True)
+    def Move(self):
+        if self.Task=="Wonder":
+            DeltaMove=0
+            if random.randint(0,20)==0:
+                DeltaMove=random.randint(-1,1)
+            if CurrentOffice.TileMap[self.X+DeltaMove][self.Y][0]!=0:
+                self.X+=DeltaMove
+            if random.randint(0,10)==0:
+                for Elv in CurrentOffice.Elevators:
+                    if Elv[0]==[self.X+1,self.Y+1]:
+                        self.Y=Elv[1][1]-1
+                    elif Elv[1]==[self.X+1,self.Y+1]:
+                        self.Y=Elv[0][1]-1
+            if random.randint(0,60)==0:
+                self.Task="WorkAtDesk"
+                self.PrevTask="Wonder"
+        elif self.Task=="WorkAtDesk":
+            if random.randint(0,20)==0:
+                DistL=0
+                DistR=0
+                try:
+                    while CurrentOffice.TileMap[self.X-DistL+1][self.Y+1][1]!=1:
+                        DistL+=1
+                except IndexError:
+                    DistL=999
+                try:
+                    while CurrentOffice.TileMap[self.X+DistR+1][self.Y+1][1]!=1:
+                        DistR+=1
+                except IndexError:
+                    DistR=999
+                if DistL==DistR==0:
+                    NewTask=random.randint(0,10)
+                    if NewTask==0:
+                        print("OOO Wonder time")
+                        self.Task="Wonder"
+                    elif NewTask==1:
+                        print("I need dat H2O stuff")
+                        self.Task="DontDydrate"
+                    elif NewTask==2:
+                        print("#PLANTGANGINSMASH")
+                        self.Task="#PlantGang"
+                elif DistL<=DistR:
+                    self.X-=1
+                elif DistL>DistR:
+                    self.X+=1
+                if DistL==DistR==999:
+                    self.PrevTask="WorkAtDesk"
+                    self.Task="SeekElevator"
+        elif self.Task=="SeekElevator":
+            if random.randint(0,30)==0:
+                DistL=0
+                DistR=0
+                try:
+                    while CurrentOffice.TileMap[self.X-DistL+1][self.Y+1][0]!=3:
+                        DistL+=1
+                except IndexError:
+                    DistL=999
+                try:
+                    while CurrentOffice.TileMap[self.X+DistR+1][self.Y+1][0]!=3:
+                        DistR+=1
+                except IndexError:
+                    DistR=999
+                if DistL<DistR:
+                    self.X-=1
+                elif DistL>DistR:
+                    self.X+=1
+                elif DistL==DistR==0:
+                    for Elv in CurrentOffice.Elevators:
+                        if Elv[0]==[self.X+1,self.Y+1]:
+                            self.Y=Elv[1][1]-1
+                        elif Elv[1]==[self.X+1,self.Y+1]:
+                            self.Y=Elv[0][1]-1
+                    self.Task=self.PrevTask
+                    self.PrevTask="SeekElevator"
+                elif DistL==DistR==999:
+                    self.Task=self.PrevTask
+                    self.PrevTest="SeekElevator"
+        elif self.Task=="DontDydrate":
+            if random.randint(0,50)==0:
+                DistL=0
+                DistR=0
+                try:
+                    while CurrentOffice.TileMap[self.X-DistL+1][self.Y+1][1]!=2:
+                        DistL+=1
+                except IndexError:
+                    DistL=999
+                try:
+                    while CurrentOffice.TileMap[self.X+DistR+1][self.Y+1][1]!=2:
+                        DistR+=1
+                except IndexError:
+                    DistR=999
+                if DistL<DistR:
+                    self.X-=1
+                elif DistL>DistR:
+                    self.X+=1
+                elif DistL==DistR==0:
+                    if random.randint(0,3)==0:
+                        self.Task="WorkAtDesk"
+                        self.PrevTest="DontDydrate"
+                elif DistL==DistR==999:
+                    self.PrevTask=self.Task
+                    print(self.PrevTask)
+                    self.Task="SeekElevator"
+        elif self.Task=="#PlantGang":
+            if random.randint(0,50)==0:
+                DistL=0
+                DistR=0
+                try:
+                    while CurrentOffice.TileMap[self.X-DistL+1][self.Y+1][1]!=3:
+                        DistL+=1
+                except IndexError:
+                    DistL=999
+                try:
+                    while CurrentOffice.TileMap[self.X+DistR+1][self.Y+1][1]!=3:
+                        DistR+=1
+                except IndexError:
+                    DistR=999
+                if DistL<DistR:
+                    self.X-=1
+                elif DistL>DistR:
+                    self.X+=1
+                elif DistL==DistR==0:
+                    if random.randint(0,3)==0:
+                        self.Task="WorkAtDesk"
+                        self.PrevTest="#PlantGang"
+                elif DistL==DistR==999:
+                    self.PrevTask=self.Task
+                    print(self.PrevTask)
+                    self.Task="SeekElevator"
+    def Draw(self):
+        Display.blit(self.Image,[(self.X-MainCamera.X)*TileScale,(self.Y-MainCamera.Y)*TileScale])
+
+Dave=Person(Name="Dave")
+Dave.X=1
+Dave.Y=5
+Dave.Task="DontDydrate"
+George=Person(Name="George")
+George.X=2
+George.Y=2
+George.Task="WorkAtDesk"
+Petty=Person(Name="Petty")
+Petty.X=1
+Petty.Y=5
+Petty.Task="#PlantGang"
+MadLad=Person(Name="Mr.Walsh")
+MadLad.X=5
+MadLad.Y=2
+
 class Cell:
     def __init__(self,Name="CPUOffice"):
         self.TileMap=[]
@@ -38,7 +194,7 @@ class Cell:
         self.SizeY=50
         self.Name=Name
         self.Load()
-        self.Elevators=[]
+        self.People=[George,Dave,MadLad,Petty]
     def Save(self):
         with open("Offices/"+str(self.Name)+".Map","w") as w:
             for x in self.TileMap:
@@ -59,7 +215,23 @@ class Cell:
                         Tile=Tile.split(".")
                         self.TileMap[x].append([int(Tile[0]),int(Tile[1].strip("\n"))])
                 x+=1
-                
+        self.Elevators()
+    def Elevators(self):
+        self.Elevators=[]
+        IndexX=0
+        IndexY=0
+        for y in self.TileMap:
+            for x in y:
+                if x[0]==3:
+                    IncY=1
+                    ElevatorOrigin=[IndexX,IndexY]
+                    while self.TileMap[ElevatorOrigin[0]][ElevatorOrigin[1]+IncY][0]==4:
+                        IncY+=1
+                    if IncY!=1:
+                        self.Elevators.append([ElevatorOrigin,[ElevatorOrigin[0],ElevatorOrigin[1]+IncY]])
+                IndexY+=1
+            IndexX+=1
+            IndexY=0
 class Camera:
     def __init__(self):
         self.X=0
@@ -86,7 +258,7 @@ def LoadImages():
     global CPUSide,CPUBack,CPUWindow,GPUSide,GPUBack,GPUWindow
     global RAMSide,RAMBack,RAMWindow,HDDSide,HDDBack,HDDWindow
     global PSUSide,PSUBack,PSUWindow,CCUSide,CCUBack,CCUWindow
-    global Desk,Selected,ElevatorEnter,ElevatorShaft
+    global Desk,Selected,ElevatorEnter,ElevatorShaft,WaterCooler,Plant
     CPUSide=LoadImage("Assets/CPU/WallSide.png",[TileScale,TileScale])
     CPUBack=LoadImage("Assets/CPU/WallBack.png",[TileScale,TileScale])
     CPUWindow=LoadImage("Assets/CPU/WallBackWindow.png",[TileScale,TileScale],True)
@@ -112,6 +284,8 @@ def LoadImages():
     CCUWindow=LoadImage("Assets/CCU/WallBackWindow.png",[TileScale,TileScale],True)
 
     Desk=LoadImage("Assets/CPU/Desk.png",[TileScale,TileScale],True)
+    WaterCooler=LoadImage("Assets/WaterCooler.png",[TileScale,TileScale],True)
+    Plant=LoadImage("Assets/Plant.png",[TileScale,TileScale],True)
 
     Selected=LoadImage("Assets/Selected.png",[TileScale,TileScale],Trans=True)
 
@@ -124,21 +298,21 @@ MainCamera=Camera()
 FrameRateText=Text("Frames: ")
 
 Tiles=[CPUSide,CPUBack,CPUWindow]
-Entitys=[None,Desk,Desk,Desk,Desk]
+Entitys=[None,Desk,WaterCooler,Plant,Desk]
 
 CurrentCell=Cell()
 #CurrentCell.Generate()
 Running=True
-Editor=False
+Editor=True
 
 OfficeSelect=LoadImage("OfficeSelect.png",[1280,720])
 
 CPUOffice=Cell(Name="CPUOffice")
-GPUOffice=Cell(Name="GPUOffice")
-RAMOffice=Cell(Name="RAMOffice")
-HDDOffice=Cell(Name="HDDOffice")
-PSUOffice=Cell(Name="PSUOffice")
-CCUOffice=Cell(Name="CCUOffice")
+#GPUOffice=Cell(Name="GPUOffice")
+#RAMOffice=Cell(Name="RAMOffice")
+#HDDOffice=Cell(Name="HDDOffice")
+#PSUOffice=Cell(Name="PSUOffice")
+#CCUOffice=Cell(Name="CCUOffice")
 
 CPUSelectText=Text("Central Processing Unit")
 GPUSelectText=Text("Graphics Processing Unit")
@@ -146,6 +320,8 @@ RAMSelectText=Text("Random Access Memory")
 HDDSelectText=Text("Hard Disk Drive")
 PSUSelectText=Text("Power Supply Unit")
 CCUSelectText=Text("Heat Sink")
+
+Peoples=LoadImage("Player.png",[round(TileScale*0.5),round(TileScale*0.75)],Trans=True)
 
 KeyDelay=0
 BuyTile=False
@@ -256,6 +432,11 @@ def InCell():
                 y+=144
                 Index+=1
 
+    #peoples
+    for Person in CurrentOffice.People:
+        Person.Move()
+        Person.Draw()
+    
     #PlayerUpdate
     MainCamera.Update()
 
@@ -309,6 +490,9 @@ def InSelect():
                 CurrentOffice=CCUOffice
                 Tiles=[CCUSide,CCUBack,CCUWindow,ElevatorEnter,ElevatorShaft]
                 DisplayState="CellOffice"
+
+def InMenu():
+    pass
 
 DisplayState="CellSelect"
 
