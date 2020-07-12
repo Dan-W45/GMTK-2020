@@ -308,11 +308,11 @@ Editor=True
 OfficeSelect=LoadImage("OfficeSelect.png",[1280,720])
 
 CPUOffice=Cell(Name="CPUOffice")
-#GPUOffice=Cell(Name="GPUOffice")
-#RAMOffice=Cell(Name="RAMOffice")
-#HDDOffice=Cell(Name="HDDOffice")
-#PSUOffice=Cell(Name="PSUOffice")
-#CCUOffice=Cell(Name="CCUOffice")
+GPUOffice=Cell(Name="GPUOffice")
+RAMOffice=Cell(Name="RAMOffice")
+HDDOffice=Cell(Name="HDDOffice")
+PSUOffice=Cell(Name="PSUOffice")
+CCUOffice=Cell(Name="CCUOffice")
 
 CPUSelectText=Text("Central Processing Unit")
 GPUSelectText=Text("Graphics Processing Unit")
